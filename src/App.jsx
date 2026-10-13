@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Lend, Members, Overdue, Report, Return } from './Screens.jsx';
 
 // The spec defines no variable for the API URL (docs ADR-005, INC-24).
 const API = 'http://localhost:8000/api/v1';
@@ -80,14 +81,27 @@ function Catalog({ token, role, onLogout }) {
   );
 }
 
+const SCREENS = { Catálogo: null, Socios: Members, Prestar: Lend, Devolver: Return, Vencidos: Overdue, Reporte: Report };
+
 export default function App() {
   const [session, setSession] = useState(null);
+  const [screen, setScreen] = useState('Catálogo');
+  const names = Object.keys(SCREENS).filter((n) => n !== 'Reporte' || session?.role === 'admin');
+  const Screen = SCREENS[screen];
 
   return (
     <main style={{ fontFamily: 'system-ui, sans-serif', padding: 16 }}>
-      {session
-        ? <Catalog token={session.token} role={session.role} onLogout={() => setSession(null)} />
-        : <Login onLogin={(token, role) => setSession({ token, role })} />}
+      {!session && <Login onLogin={(token, role) => setSession({ token, role })} />}
+      {session && (
+        <>
+          <nav style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {names.map((n) => <button key={n} onClick={() => setScreen(n)} disabled={n === screen}>{n}</button>)}
+          </nav>
+          {Screen
+            ? <Screen token={session.token} />
+            : <Catalog token={session.token} role={session.role} onLogout={() => setSession(null)} />}
+        </>
+      )}
     </main>
   );
 }
