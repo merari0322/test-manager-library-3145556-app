@@ -94,6 +94,10 @@ export default function App() {
       {!session && <Login onLogin={(token, role) => setSession({ token, role })} />}
       {session && (
         <>
+          <header className="topbar">
+            <div className="brand"><span />Manager Library</div>
+            <div>{session.role} · <button onClick={() => setSession(null)}>Cerrar sesión</button></div>
+          </header>
           <nav style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {names.map((n) => <button key={n} onClick={() => setScreen(n)} disabled={n === screen}>{n}</button>)}
           </nav>
